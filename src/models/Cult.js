@@ -20,8 +20,12 @@ class Cult extends Sequelize.Model {
         allowNull: false,
         validate: {
           len: {
-            args: [16, 16],
-            msg: 'O número do cartão deve ter 16 caracteres',
+            args: [19, 19],
+            msg: 'O número do cartão deve ter 19 caracteres',
+          },
+          is: {
+            args: /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/,
+            msg: 'O número do cartão deve estar no formato 0000 0000 0000 0000',
           }
         }
       },

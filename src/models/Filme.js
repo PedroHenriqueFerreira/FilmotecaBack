@@ -47,7 +47,7 @@ class Filme extends Sequelize.Model {
         validate: {
           min: {
             args: [1888],
-            msg: 'O ano mínimo é 0',
+            msg: 'O ano mínimo é 1888',
           },
           max: {
             args: [new Date().getFullYear()],

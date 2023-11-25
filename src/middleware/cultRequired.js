@@ -7,7 +7,7 @@ const cultRequired = async (req, res, next) => {
       return next();
     } else {
       return res.status(401).json({
-        errors: ['O usuário não é um Cult'],
+        errors: ['É necessário ser um Cult para realizar esta ação'],
       });
     }
   } catch (e) {

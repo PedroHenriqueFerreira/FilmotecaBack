@@ -9,8 +9,8 @@ class Comentario extends Sequelize.Model {
         allowNull: false,
         validate: {
           len: {
-            args: [10, 2000],
-            msg: 'O comentário deve ter entre 10 e 2000 caracteres',
+            args: [3, 2000],
+            msg: 'O comentário deve ter entre 3 e 2000 caracteres',
           }
         }
       }

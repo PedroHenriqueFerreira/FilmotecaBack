@@ -6,6 +6,7 @@ const cultRequired = require('../middleware/cultRequired');
 const router = Router();
 
 router.post('/criar', loginRequired, cultRequired, filmeController.criar);
+
 router.post('/assistir/:filmeId', loginRequired, filmeController.assistir);
 router.post('/favoritar/:filmeId', loginRequired, filmeController.favoritar);
 
@@ -20,6 +21,12 @@ router.get('/populares', filmeController.populares);
 
 router.post('/comentar/:filmeId', loginRequired, cultRequired, filmeController.comentar);
 
+router.get('/generos', filmeController.generos);
+
+router.get('/criar/:codigo', filmeController.criarComCodigo);
+
 router.get('/:id', filmeController.buscarPorId);
+
+
 
 module.exports = router;

@@ -7,6 +7,39 @@ const Comentario = require('../models/Comentario');
 const Usuario = require('../models/Usuario');
 
 module.exports = {
+  async criarComCodigo(req, res) {
+    try {
+      const url = `http://www.omdbapi.com/?apikey=22d3358b&i=${req.params.codigo}`;
+
+      const response = await fetch(url);
+
+      const data = await response.json();
+
+      const poster = data['Poster'];
+      const avaliacao = parseInt(data['imdbRating']);
+      const genero = data['Genre'].split(', ')[0];
+      const ano = parseInt(data['Year']);
+      const titulo = data['Title'];
+      const sinopse = data['Plot'];
+
+      const filme = await Filme.findOne({ where: { titulo } });
+
+      if (filme) {
+        return res.status(400).json({ errors: ['Filme já cadastrado'] });
+      }
+
+      await Filme.create({ poster, avaliacao, genero, ano, titulo, sinopse });
+
+      return res.json({ message: 'Filme cadastrado com sucesso!' });
+    } catch(e) {
+
+      // Lidar com erros
+      return res.status(400).json({
+        errors: ['Filme não encontrado'],
+      });
+    }
+  },
+
   async criar(req, res) {
     try {
       const { 
@@ -84,8 +117,6 @@ module.exports = {
       }
 
     } catch(e) {
-      console.log(e);
-      
       // Lidar com erros
       return res.status(400).json({
         errors: e.errors.map((err) => err.message),
@@ -119,7 +150,9 @@ module.exports = {
         }]
       });
 
-      return res.json({ message: 'Assistidos encontrados com sucesso!', filmes });
+      const filmesAleatorios = filmes.sort(() => Math.random() - Math.random());
+
+      return res.json({ message: 'Assistidos encontrados com sucesso!', filmes: filmesAleatorios });
     } catch(e) {
       // Lidar com erros
       return res.status(400).json({
@@ -138,7 +171,9 @@ module.exports = {
         }]
       });
 
-      return res.json({ message: 'Favoritos encontrados com sucesso!', filmes });
+      const filmesAleatorios = filmes.sort(() => Math.random() - Math.random());
+
+      return res.json({ message: 'Favoritos encontrados com sucesso!', filmes: filmesAleatorios });
     } catch(e) {
       // Lidar com erros
       return res.status(400).json({
@@ -165,12 +200,12 @@ module.exports = {
           id: {
             [sequelize.Op.notIn]: ids
           }
-        },
-        limit: 24
+        }
       });
 
+      const filmesAleatorios = filmes.sort(() => Math.random() - Math.random());
 
-      return res.json({ message: 'Recomendações encontradas com sucesso!', filmes });
+      return res.json({ message: 'Recomendações encontradas com sucesso!', filmes: filmesAleatorios });
     } catch(e) {
       // Lidar com erros
       return res.status(400).json({
@@ -186,12 +221,10 @@ module.exports = {
         order: [
           ['avaliacao', 'DESC']
         ],
-        limit: 24
       });
 
       return res.json({ message: 'Filmes populares encontrados com sucesso!', filmes });
     } catch(e) {
-      console.log(e);
 
       // Lidar com erros
       return res.status(400).json({
@@ -217,7 +250,6 @@ module.exports = {
       return res.json({ message: 'Comentário criado com sucesso!' });
 
     } catch(e) {
-      console.log(e);
       
       // Lidar com erros
       return res.status(400).json({
@@ -251,11 +283,36 @@ module.exports = {
       return res.json({ message: 'Filme encontrado com sucesso!', filme });
 
     } catch(e) {
-      console.log(e);
       
       // Lidar com erros
       return res.status(400).json({
         errors: ['Filme não encontrado'],
+      });
+    }
+  },
+
+  async generos(req, res) {
+    try {
+      const filmes = await Filme.findAll();
+
+      const generos = filmes.map((filme) => filme.genero);
+
+      const generosUnicos = [...new Set(generos)];
+
+      const filmesPorGenero = generosUnicos.map((genero) => {
+        return {
+          genero,
+          filmes: filmes.filter((filme) => filme.genero === genero)
+        }
+      });
+
+      return res.json({ message: 'Filmes agrupados por gênero com sucesso!', generos: filmesPorGenero });
+
+    } catch(e) {
+      
+      // Lidar com erros
+      return res.status(400).json({
+        errors: ['Filmes não encontrados'],
       });
     }
   }

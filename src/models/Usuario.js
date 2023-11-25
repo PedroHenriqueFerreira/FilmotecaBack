@@ -10,8 +10,8 @@ class Usuario extends Sequelize.Model {
         defaultValue: '',
         validate: {
           len: {
-            args: [2, 255],
-            msg: 'O apelido deve ter entre 2 e 255 caracteres',
+            args: [2, 100],
+            msg: 'O apelido deve ter entre 2 e 100 caracteres',
           },
         },
       },

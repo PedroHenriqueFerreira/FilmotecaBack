@@ -36,7 +36,6 @@ const loginRequired = async (req, res, next) => {
 
     return next();
   } catch (e) {
-    console.log(e);
 
     return res.status(401).json({
       errors: ['Token expirado ou inválido.'],

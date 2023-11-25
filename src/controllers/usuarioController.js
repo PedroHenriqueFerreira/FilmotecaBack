@@ -49,7 +49,6 @@ module.exports = {
         res.status(404).json({ errors: ['Usuário não encontrado'] });
       }      
     } catch (e) {
-      console.log(e);
 
       // Lidar com erros
       return res.status(400).json({
@@ -60,15 +59,26 @@ module.exports = {
 
   async perfil(req, res) {
     try {
-      const usuario = await Usuario.findByPk(req.usuarioId);
+      const usuario = await Usuario.findOne(
+        {
+          include: [{
+            model: Cult,
+          }],
+          where: {
+            id: req.usuarioId
+          }
+        }   
+      );
 
       if (!usuario) {
         return res.status(404).json({ errors: ['Usuário não encontrado'] });
       }
 
+      const isCult = usuario.Cult ? true : false;
+
       const { id, apelido, email } = usuario;
 
-      return res.json({ id, apelido, email });
+      return res.json({ id, apelido, email, isCult, cult: usuario.Cult });
     } catch(e) {
       // Lidar com erros
       return res.status(400).json({
@@ -83,6 +93,16 @@ module.exports = {
 
       if (!usuario) {
         return res.status(404).json({ errors: ['Usuário não encontrado'] });
+      }
+
+      const { senha_atual = '', senha = '' } = req.body;
+
+      if ((!senha_atual && senha) || (senha_atual && !senha)) {
+        return res.status(401).json({ errors: ['Senha atual e nova senha são obrigatórias'] });
+      }
+
+      if (senha_atual && !(await usuario.validarSenha(senha_atual))) {
+        return res.status(401).json({ errors: ['Senha atual incorreta'] });
       }
 
       await usuario.update(req.body);
